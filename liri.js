@@ -5,15 +5,17 @@ var request = require("request");
 // Load the fs package to read and write
 var fs = require("fs");
 //get spotify package
-var spotify = require('spotify');
+var Spotify = require('node-spotify-api');
 //get twitter package
 var Twitter=require('twitter');
 //keys for Twitter & Spotify credentials
 var keys = require("./keys.js");
 //access your keys information
-//var spotify = new Spotify(keys.spotify);
-console.log(typeof(keys.spotify.id));
-console.log(keys.spotify.secret);
+var spotify = new Spotify({
+	id : keys.spotify.id,
+  secret : keys.spotify.secret,
+});
+
 
 
 var client = new Twitter({
@@ -47,6 +49,15 @@ function spotifyThisSong(song)
 		song="The Sign";
 	}
 	console.log(song);
+
+	spotify.search({ type: "track", query: song, limit:1 }, function(err, data) {
+  if (err) {
+    return console.log("Error occurred: " + err);
+  }
+ //link of song
+console.log(data.tracks.href); 
+console.log(data); 
+});
 
 	//Artist(s)
 //The song's name
@@ -120,5 +131,5 @@ function movieThis(movieName)
 //doWhatItSays();
 //myTweets();
 //movieThis("");
-//spotifyThisSong("");
+spotifyThisSong("");
 
