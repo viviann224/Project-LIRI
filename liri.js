@@ -33,10 +33,11 @@ var userInput = process.argv[2];
 //they were created at in your terminal/bash window.
 function myTweets()
 {
-	client.get('search/tweets', {q: 'node.js'}, function(error, tweets, response) 
+	client.get('statuses/user_timeline/', {q: 'node.js'}, function(error, tweets, response) 
 	{
-		console.log(tweets.statuses[0].text);
-		console.log(tweets.statuses[0].created_at);  
+		console.log(tweets[0].text);
+		//console.log(tweets.statuses[0].text);
+		//console.log(tweets.statuses[0].created_at);  
 	});
 }
 // spotify-this-song <song name>
@@ -46,23 +47,36 @@ function spotifyThisSong(song)
 	//if there is no user input for the spotifyThisSOng, default it to "The Sign"
 	if(mySong=="")
 	{
-		song="The Sign";
+		mySong="The Sign";
 	}
-	console.log(song);
+	console.log(mySong);
 
-	spotify.search({ type: "track", query: song, limit:1 }, function(err, data) {
+	spotify.search({ type: "track", query: mySong, limit:1 }, function(err, data) {
   if (err) {
     return console.log("Error occurred: " + err);
   }
+  console.log(JSON.stringify(data, null, 2));
+
  //link of song
-console.log(data.tracks.href); 
-console.log(data); 
+//console.log(data.tracks.href); 
+//console.log(data.tracks.items[0].artist[0].name); 
+//console.log(data.tracks.items[0]);
+//console.log("Name: "+data.tracks.items[0].name);
+//console.log("Preview Link: "+data.tracks.items[0].album.artists.external_urls);
+//console.log("Album: "+data.tracks.items[0].external_urls);
+console.log("Artist: "+JSON.stringify(data.tracks.items[0].album.artists[0].name, null, 2));
+
+console.log("Preview Link: "+JSON.stringify(data.tracks.items[0].album.artists[0].external_urls.spotify, null, 2));
+console.log("Song: "+JSON.stringify(data.tracks.items[0].name, null, 2));
+console.log("Album: "+JSON.stringify(data.tracks.items[0].album.name, null, 2));
+
 });
 
 	//Artist(s)
 //The song's name
 // A preview link of the song from Spotify
 // The album that the song is from
+
 }
 
 
