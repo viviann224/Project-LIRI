@@ -35,9 +35,11 @@ function myTweets()
 {
 	client.get('statuses/user_timeline/', {q: 'node.js'}, function(error, tweets, response) 
 	{
-		console.log(tweets[0].text);
-		//console.log(tweets.statuses[0].text);
-		//console.log(tweets.statuses[0].created_at);  
+		for(var x=0; x<20; x++)
+		{
+			console.log((x+1)+" "+ tweets[x].text);
+			console.log(tweets[x].created_at);
+		}
 	});
 }
 // spotify-this-song <song name>
