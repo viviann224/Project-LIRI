@@ -2,6 +2,8 @@
 require("dotenv").config();
 // get request npm package 
 var request = require("request");
+//get inquirer npm package
+var inquirer = require("inquirer");
 // Load the fs package to read and write
 var fs = require("fs");
 //get spotify package
@@ -11,12 +13,11 @@ var Twitter=require('twitter');
 //keys for Twitter & Spotify credentials
 var keys = require("./keys.js");
 //access your keys information
+//***USER INQUIRER
 var spotify = new Spotify({
 	id : keys.spotify.id,
   secret : keys.spotify.secret,
 });
-
-
 
 var client = new Twitter({
 	consumer_key:keys.twitter.consumer_key,
@@ -25,8 +26,25 @@ var client = new Twitter({
   	access_token_secret: keys.twitter.access_token_secret
 	});
 
+function start()
+{
+	
+}
+var action = process.argv[2];
 
-var userInput = process.argv[2];
+//creates name function based on user input
+function getName()
+{
+	//var myname=process.arvg.split(" ");
+	var nameConcat="";
+	for(var x=2; x<process.argv.length; x++)
+	{
+		nameConcat+=(process.argv[x]+" ");
+	}
+	console.log("name concat: "+nameConcat);
+
+}
+
 //console.log(userInput);
 // my-tweets
 //show your last 20 tweets and when 
@@ -35,23 +53,27 @@ function myTweets()
 {
 	client.get('statuses/user_timeline/', {q: 'node.js'}, function(error, tweets, response) 
 	{
+		console.log("--------------------");
 		for(var x=0; x<20; x++)
 		{
+
 			console.log((x+1)+" "+ tweets[x].text);
 			console.log(tweets[x].created_at);
+			console.log("--------------------");
 		}
 	});
 }
-// spotify-this-song <song name>
+//spotify-this-song <song name>
+//update spotify
 function spotifyThisSong(song)
 {
 	var mySong=song.trim();
 	//if there is no user input for the spotifyThisSOng, default it to "The Sign"
 	if(mySong=="")
 	{
-		mySong="The Sign";
+		mySong="The+Sign";
 	}
-	console.log(mySong);
+	//console.log(mySong);
 
 	spotify.search({ type: "track", query: mySong, limit:1 }, function(err, data) 
 	{
@@ -59,7 +81,7 @@ function spotifyThisSong(song)
 	  {
 	    return console.log("Error occurred: " + err);
 	  }
-  		console.log(JSON.stringify(data, null, 2));
+  		//console.log(JSON.stringify(data, null, 2));
 		//artist info
 		console.log("Artist: "+JSON.stringify(data.tracks.items[0].album.artists[0].name, null, 2));
 		//song name
@@ -82,7 +104,7 @@ function movieThis(movieName)
 	}
 	// Then run a request to the OMDB API with the specified movie
 	var queryUrl = "http://www.omdbapi.com/?t=" + movieName + "&y=&plot=short&apikey=trilogy";
-	console.log(queryUrl);
+	//console.log(queryUrl);
 	request(queryUrl, function(error, response, body) 
 	{
 	  // If the request is successful lets display the info
@@ -109,30 +131,74 @@ function movieThis(movieName)
   function doWhatItSays()
   {
 
+  		
+	  fs.readFile("random.txt", "utf8", function(err, data) 
+	  {
+	    if (err) 
+	    {
+	      return console.log(err);
+	    }
+	    console.log("reading files");
+	    //console.log(data);
+	    // splits the text data 
+	    //data=data.remove(",");
+	    data = data.split(",");
+	     //console.log("data after splitting: "+data.length);
 
-  fs.readFile("random.txt", "utf8", function(err, data) {
-    if (err) 
-    {
-      return console.log(err);
-    }
-    /*
-    // Break down all the numbers inside
-    data = data.split(", ");
-    var result = 0;
-
-    // Loop through those numbers and add them together to get a sum.
-    for (var i = 0; i < data.length; i++) {
-      if (parseFloat(data[i])) {
-        result += parseFloat(data[i]);
-      }
-    }
-	*/
-    // We will then print the final balance rounded to two decimal places.
-    console.log(data);
-  });
+	    var name = "";
+	 	var action=data[0];
+	 	//console.log("action: "+action);
+	 	if(action.includes(","))
+	    	{
+	    		action=action.replace(",","");
+	    	}
+	    	//console.log(action)
+	    // Loop through those numbers and add them together to get a sum.
+	    for (var i = 1; i < data.length; i++) 
+	    {
+			data[i]=data[i].replace('"', '');
+	        name += data[i];
+	    }
+	    name=name.replace('"', "");
+		//console.log("name concat"+name);
+	    // We will then print the final balance rounded to two decimal places.
+	    whatToDo(action, name);
+	  });
 }
-//doWhatItSays();
-myTweets();
+///replace fx
+//function for name concatation***
+//function for case statement***
+function whatToDo(action, myString)
+{
+	//console.log(action);
+	//console.log(action.includes("spotify-this-song"));
+
+	if(action.includes("spotify-this-song"))
+	{
+		console.log("inside spotify this song dummy");
+		spotifyThisSong(myString);
+	}
+	else if(action.includes("my-tweets"))
+	{
+		console.log("inside my tweets dummy");
+		myTweets();
+	}
+	else if(action.includes("movie-this"))
+	{
+		console.log("inside movie this dummy");
+		movieThis(myString);
+	}
+	else if(action.includes("do-what-it-says"))
+	{
+		console.log("inside dowhat it says dummy");
+		doWhatItSays();
+	}
+}
+
+
+//getName();
+doWhatItSays();
+//myTweets();
 //movieThis("");
 //spotifyThisSong("");
-
+//whatToDo(action, name);
