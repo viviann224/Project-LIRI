@@ -12,13 +12,12 @@ var Spotify = require('node-spotify-api');
 var Twitter=require('twitter');
 //keys for Twitter & Spotify credentials
 var keys = require("./keys.js");
-//access your keys information
-//***USER INQUIRER
+//access spotify key information
 var spotify = new Spotify({
   id : keys.spotify.id,
   secret : keys.spotify.secret,
 });
-
+//access spotify key information
 var client = new Twitter({
   consumer_key:keys.twitter.consumer_key,
   consumer_secret: keys.twitter.consumer_secret,
@@ -26,62 +25,68 @@ var client = new Twitter({
     access_token_secret: keys.twitter.access_token_secret
   });
 
+//start function. This the first menu when liri.js 
+//runs to display the option menu
+//first asks user for an action and based on action will either 
+//call a function to do an action such as get tweets or read and do what it says
+// or asks for a name to pass the name to get a spotify song or get a movie
 function start()
 {
+  //using inquirer as a form of input validation
   inquirer.prompt([
-
+  	//first prompt displays the menu options
   {
     type: "list",
     name: "action",
     message: "-----Main Menu-----\n please select an option:",
     choices: ["Get my Tweets", "Get a Spotify Song", "Get a Movie", "Read a file & Do What it Says"]
   },
-  /*{
-      name: "twitter",
-      message: "Do you want to get the Tweets?",
-      type: "confirm",
-      when: function(user) {
-          return user.action === "Get my Tweets"
-      }
-  },*/
+  //if the user clicks on spotify ask user for song name
+  //and set to user.action
   {
       name: "spotify",
-      message: "What song are you looking for?",
+      message: "Please input song name: ",
       when: function(user) {
           return user.action === "Get a Spotify Song"
       }
   },
+  //if the user clicks on movie ask user for movie 
+  //name set to user.action
   {
       name: "movie",
-      message: "What movie are you thinking of?",
+      message: "Please input movie name: ",
       when: function(user) {
           return user.action ===  "Get a Movie"
       }
   },
+  //then pass the user object to preform actions
   ]).then(function(user) {
-  console.log(user.action);
+  //console.log(user.action);
 
-  // If the user guesses the password...
+  //if the user clicks on tweets call myTweets function
   if(user.action=== "Get my Tweets") 
   {
-    console.log("inside my tweets dummy");
+    //console.log("inside my tweets dummy");
     myTweets();
   }
+  //if the user clicks on spotify call spotifyThisSong function
   else if(user.action.includes("Spotify"))
   {
-    console.log("inside spotify this song dummy");
+    //console.log("inside spotify this song dummy");
    //findName();
    //console.log(user.spotify);
    spotifyThisSong(user.spotify);
   }
+  //if the user clicks on movie call movieThis function
   else if(user.action.includes("Movie"))
   {
-    console.log("inside movie this dummy");
+    //console.log("inside movie this dummy");
     movieThis(user.movie);
   }
+  //if the user clicks on do what it says, call doWhatItSays function
   else if(user.action === "Read a file & Do What it Says")
   {
-    console.log("inside dowhat it says dummy");
+    //console.log("inside dowhat it says dummy");
     doWhatItSays();
   }
   //calling restart function asynchronously to ask user to restart
@@ -98,7 +103,7 @@ function restart()
   .prompt([
     {
       type: "confirm",
-      message: "Do you want to run this program, again?",
+      message: "\nDo you want to run this program, again?",
       name: "confirm",
       default: true
     }
@@ -110,7 +115,7 @@ function restart()
     }
     else
     {
-      console.log("You exited out of the game.\nGoodbye!");
+      console.log("\nYou exited out of the game.\nGoodbye!");
     }
   });
 }
@@ -122,7 +127,7 @@ function myTweets()
 {
   client.get('statuses/user_timeline/', {q: 'node.js'}, function(error, tweets, response) 
   {
-    console.log("--------------------");
+    console.log("\n--------------------");
     for(var x=0; x<20; x++)
     {
 
@@ -151,7 +156,7 @@ function spotifyThisSong(song)
     {
       return console.log("Error occurred: " + err);
     }
-      //console.log(JSON.stringify(data, null, 2));
+    console.log("\n---------------------------------------");
     //artist info
     console.log("Artist: "+JSON.stringify(data.tracks.items[0].album.artists[0].name, null, 2));
     //song name
@@ -160,6 +165,7 @@ function spotifyThisSong(song)
     console.log("Preview Link: "+JSON.stringify(data.tracks.items[0].album.artists[0].external_urls.spotify, null, 2));
     //album of the song
     console.log("Album: "+JSON.stringify(data.tracks.items[0].album.name, null, 2));
+  	console.log("---------------------------------------\n");
   });
 }
 
@@ -180,6 +186,7 @@ function movieThis(movieName)
     // If the request is successful lets display the info
       if (!error && response.statusCode === 200) 
     {
+    	console.log("\n---------------------------------------");
         console.log("* Title of the movie. " + JSON.parse(body).Title);
         console.log("* Year the movie came out " + JSON.parse(body).Year);
         console.log("* IMDB Rating of the movie. " + JSON.parse(body).imdbRating);
@@ -188,6 +195,7 @@ function movieThis(movieName)
         console.log("* Language of the movie. " + JSON.parse(body).Language);
         console.log("* Plot of the movie. " + JSON.parse(body).Plot);
         console.log("* Actors in the movie. " + JSON.parse(body).Actors);
+      console.log("---------------------------------------\n");
       }
   });
 }
@@ -243,22 +251,22 @@ function whatToDo(action, myString)
 
   if(action.includes("spotify-this-song"))
   {
-    console.log("inside spotify this song dummy");
+    //console.log("inside spotify this song dummy");
     spotifyThisSong(myString);
   }
   else if(action.includes("my-tweets"))
   {
-    console.log("inside my tweets dummy");
+    //console.log("inside my tweets dummy");
     myTweets();
   }
   else if(action.includes("movie-this"))
   {
-    console.log("inside movie this dummy");
+    //console.log("inside movie this dummy");
     movieThis(myString);
   }
   else if(action.includes("do-what-it-says"))
   {
-    console.log("inside dowhat it says dummy");
+    //console.log("inside dowhat it says dummy");
     doWhatItSays();
   }
 }
