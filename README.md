@@ -39,7 +39,7 @@ This is the first version of Project LIRI
 This project is licensed under Sublime.
 
 **AUTHOR**:
--Vivian Tuong Nguyen - Initial work
+Vivian Tuong Nguyen - Initial work
 
 **ACKNOWLEDGMENTS**:
 All rights are reserved to Vivian Tuong Nguyen. Do not alter or manipulate content and images from Vivian Tuong Nguyen.
