@@ -34,7 +34,7 @@ function start()
 {
   //using inquirer as a form of input validation
   inquirer.prompt([
-  	//first prompt displays the menu options
+  //first prompt displays the menu options
   {
     type: "list",
     name: "action",
@@ -61,45 +61,37 @@ function start()
   },
   //then pass the user object to preform actions
   ]).then(function(user) {
-  //console.log(user.action);
-
   //if the user clicks on tweets call myTweets function
   if(user.action=== "Get my Tweets") 
   {
-    //console.log("inside my tweets dummy");
     myTweets();
   }
   //if the user clicks on spotify call spotifyThisSong function
   else if(user.action.includes("Spotify"))
   {
-    //console.log("inside spotify this song dummy");
-   //findName();
-   //console.log(user.spotify);
    spotifyThisSong(user.spotify);
   }
   //if the user clicks on movie call movieThis function
   else if(user.action.includes("Movie"))
   {
-    //console.log("inside movie this dummy");
     movieThis(user.movie);
   }
   //if the user clicks on do what it says, call doWhatItSays function
   else if(user.action === "Read a file & Do What it Says")
   {
-    //console.log("inside dowhat it says dummy");
     doWhatItSays();
   }
   //calling restart function asynchronously to ask user to restart
   //after doing all actions
   setTimeout(restart, 3000);
   });
- 
-
 }
+
 //restart function will ask user to restart or terminate the program
 function restart()
 {
   inquirer
+  //ask the user if the way to run the program again
   .prompt([
     {
       type: "confirm",
@@ -109,20 +101,21 @@ function restart()
     }
       ])
   .then(function(response) {
+  	//if yes, call the start function to run again
     if(response.confirm)
     {
       start();
     }
+    //else terminate the program and tell the user goodbye!
     else
     {
       console.log("\nYou exited out of the game.\nGoodbye!");
     }
   });
 }
-//console.log(userInput);
-// my-tweets
-//show your last 20 tweets and when 
-//they were created at in your terminal/bash window.
+
+//myTweets() function calls for twitter and gets the last 20 tweets to 
+//display
 function myTweets()
 {
   client.get('statuses/user_timeline/', {q: 'node.js'}, function(error, tweets, response) 
@@ -130,16 +123,15 @@ function myTweets()
     console.log("\n--------------------");
     for(var x=0; x<20; x++)
     {
-
-      console.log((x+1)+" "+ tweets[x].text);
-      console.log(tweets[x].created_at);
+      console.log("Tweet: "+tweets[x].text);
+      console.log("Date:  "+tweets[x].created_at);
       console.log("--------------------");
     }
   });
 }
 
-//spotify-this-song <song name>
-//update spotify
+//the spotifyThisSong takes in a song name and creates a call to spotify
+//to get and display song information
 function spotifyThisSong(song)
 {
   var mySong=song.trim();
@@ -148,14 +140,14 @@ function spotifyThisSong(song)
   {
     mySong="The+Sign";
   }
-  //console.log(mySong);
-
   spotify.search({ type: "track", query: mySong, limit:1 }, function(err, data) 
   {
+  	//if there is an error display error
     if (err) 
     {
       return console.log("Error occurred: " + err);
     }
+    //else display the song information
     console.log("\n---------------------------------------");
     //artist info
     console.log("Artist: "+JSON.stringify(data.tracks.items[0].album.artists[0].name, null, 2));
@@ -169,7 +161,8 @@ function spotifyThisSong(song)
   });
 }
 
-// movie-this <movie name>
+// movieThis function takes in a movie name and creates  call to get movie
+//information
 function movieThis(movieName)
 {
   var myMovie=movieName.trim();
@@ -180,7 +173,6 @@ function movieThis(movieName)
   }
   // Then run a request to the OMDB API with the specified movie
   var queryUrl = "http://www.omdbapi.com/?t=" + movieName + "&y=&plot=short&apikey=trilogy";
-  //console.log(queryUrl);
   request(queryUrl, function(error, response, body) 
   {
     // If the request is successful lets display the info
@@ -195,81 +187,66 @@ function movieThis(movieName)
         console.log("* Language of the movie. " + JSON.parse(body).Language);
         console.log("* Plot of the movie. " + JSON.parse(body).Plot);
         console.log("* Actors in the movie. " + JSON.parse(body).Actors);
-      console.log("---------------------------------------\n");
+      	console.log("---------------------------------------\n");
       }
   });
 }
 
-//use node package
-//takes the text inside of random.txt and 
-//use to call one of LIRI's commands
-  // We will read the existing bank file
+//takes the text inside of random.txt and use to call one of LIRI's commands
   function doWhatItSays()
   {
-
-      
     fs.readFile("random.txt", "utf8", function(err, data) 
     {
+    	//if the file does not read display error msg
       if (err) 
       {
         return console.log(err);
       }
-      console.log("reading files");
-      //console.log(data);
-      // splits the text data 
-      //data=data.remove(",");
+      //else read the file and split the words into an array
       data = data.split(",");
-       //console.log("data after splitting: "+data.length);
 
       var name = "";
+      //first word is the action call
     var action=data[0];
-    //console.log("action: "+action);
+    //remove the commas
     if(action.includes(","))
         {
           action=action.replace(",","");
         }
-        //console.log(action)
-      // Loop through those numbers and add them together to get a sum.
+      // Loop through to concatinate word from the file to create the name
       for (var i = 1; i < data.length; i++) 
       {
       data[i]=data[i].replace('"', '');
           name += data[i];
       }
+      //for some reason there is a difference of end quotes for the front and back for me
+      //had thus why had to replace with a different quote
       name=name.replace('"', "");
-    //console.log("name concat"+name);
       // We will then print the final balance rounded to two decimal places.
       whatToDo(action, name);
     });
 }
-///replace fx
-//function for name concatation***
-//function for case statement***
+
+//complementary function with doWhatItSays() creates the action and string
+//passes to whatToDo to determie what actions to run
 function whatToDo(action, myString)
 {
-  //console.log(action);
-  //console.log(action.includes("spotify-this-song"));
-
   if(action.includes("spotify-this-song"))
   {
-    //console.log("inside spotify this song dummy");
     spotifyThisSong(myString);
   }
   else if(action.includes("my-tweets"))
   {
-    //console.log("inside my tweets dummy");
     myTweets();
   }
   else if(action.includes("movie-this"))
   {
-    //console.log("inside movie this dummy");
     movieThis(myString);
   }
   else if(action.includes("do-what-it-says"))
   {
-    //console.log("inside dowhat it says dummy");
     doWhatItSays();
   }
 }
+//when liri.js is opened via terminal / bash.. calls start function
 start();
-
-
